@@ -1,52 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>E-Sports Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Sports Team Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-        <h1 class="text-2xl font-bold mb-6">E-Sports Team Manager</h1>
-        
-        <form action="{{ url_for('add') }}" method="post" class="mb-8 p-4 bg-blue-50 rounded">
-            <h2 class="font-semibold mb-2">เพิ่มนักแข่งใหม่</h2>
-            <input type="text" name="name" placeholder="ชื่อ (IGN)" required class="border p-2 mr-2">
-            <input type="text" name="role" placeholder="ตำแหน่ง" required class="border p-2 mr-2">
-            <select name="team_id" class="border p-2 mr-2">
-                {% for team in teams %}
-                    <option value="{{ team['team_id'] }}">{{ team['team_name'] }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">เพิ่มข้อมูล</button>
-        </form>
+<body class="bg-[#FBF9F6] text-stone-800 p-6 md:p-12 selection:bg-stone-300">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-stone-800 tracking-tight mb-2">E-Sports Manager</h1>
+            <p class="text-stone-500">ระบบจัดการข้อมูลนักแข่งและทีมอีสปอร์ต (Minimal Edition)</p>
+        </div>
 
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border p-2">ID</th>
-                    <th class="border p-2">ชื่อนักแข่ง</th>
-                    <th class="border p-2">ตำแหน่ง</th>
-                    <th class="border p-2">ทีมสังกัด</th>
-                    <th class="border p-2">จัดการ</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for player in players %}
-                <tr>
-                    <td class="border p-2">{{ player['player_id'] }}</td>
-                    <td class="border p-2">{{ player['player_name'] }}</td>
-                    <td class="border p-2">{{ player['role'] }}</td>
-                    <td class="border p-2">{{ player['team_name'] }}</td>
-                    <td class="border p-2">
-                        <form action="{{ url_for('delete', id=player['player_id']) }}" method="post" class="inline">
-                            <button type="submit" class="text-red-500 hover:underline">ลบ</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 mb-10 transition-all duration-300 hover:shadow-md">
+            <h2 class="text-lg font-semibold mb-6 text-stone-700 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                เพิ่มนักแข่งใหม่
+            </h2>
+            <form action="{{ url_for('add') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <input type="text" name="name" placeholder="ชื่อในเกม (IGN)" required 
+                    class="bg-[#F8F7F4] border border-stone-200 text-stone-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all placeholder:text-stone-400">
+                <input type="text" name="role" placeholder="ตำแหน่ง (Role)" required 
+                    class="bg-[#F8F7F4] border border-stone-200 text-stone-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all placeholder:text-stone-400">
+                <select name="team_id" class="bg-[#F8F7F4] border border-stone-200 text-stone-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all cursor-pointer">
+                    <option value="" disabled selected>-- เลือกสังกัดทีม --</option>
+                    {% for team in teams %}
+                        <option value="{{ team['team_id'] }}">{{ team['team_name'] }} ({{ team['region'] }})</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" 
+                    class="bg-stone-800 hover:bg-stone-900 text-white font-medium py-3 px-6 rounded-xl transition duration-300 transform hover:-translate-y-1 hover:shadow-lg flex justify-center items-center gap-2">
+                    บันทึกข้อมูล
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-stone-100 transition-all duration-300 hover:shadow-md">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-stone-50 text-stone-500 text-sm uppercase tracking-wider border-b border-stone-100">
+                            <th class="p-5 font-medium">ID</th>
+                            <th class="p-5 font-medium">ชื่อนักแข่ง (IGN)</th>
+                            <th class="p-5 font-medium">ตำแหน่ง</th>
+                            <th class="p-5 font-medium">สังกัดทีม</th>
+                            <th class="p-5 font-medium text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        {% for player in players %}
+                        <tr class="hover:bg-[#FDFBF7] transition duration-200 group">
+                            <td class="p-5 text-stone-400 font-mono text-sm">{{ player['player_id'] }}</td>
+                            <td class="p-5 font-semibold text-stone-800">{{ player['player_name'] }}</td>
+                            <td class="p-5 text-stone-600"><span class="bg-stone-100 px-3 py-1 rounded-full text-sm">{{ player['role'] }}</span></td>
+                            <td class="p-5">
+                                <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium">
+                                    {{ player['team_name'] }}
+                                </span>
+                            </td>
+                            <td class="p-5 text-center space-x-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ url_for('edit', id=player['player_id']) }}" 
+                                   class="inline-block text-stone-600 bg-stone-100 hover:bg-stone-200 hover:text-stone-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                    แก้ไข
+                                </a>
+                                
+                                <form action="{{ url_for('delete', id=player['player_id']) }}" method="POST" class="inline" onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ {{ player['player_name'] }}?');">
+                                    <button type="submit" 
+                                            class="text-red-500 bg-red-50 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                        ลบ
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if not players %}
+            <div class="text-center py-10 text-stone-400">
+                <p>ยังไม่มีข้อมูลนักแข่งในระบบ</p>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>
